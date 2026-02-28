@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Academic Notes</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><a href="">Academic Research Notes</a></h1>
+            <nav>
+                
+                    <a href="hydrology/">Hydrology</a>
+                
+                    <a href="meteorology/">Meteorology</a>
+                
+                    <a href="codes/">Codes</a>
+                
+                    <a href="culture/">Culture</a>
+                
+                    <a href="movies/">Movies</a>
+                
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        
+<article class="post">
+    <h1>植被极端生长与全球气候极端事件关联性分析</h1>
+<h2>1. 目的与方法论</h2>
+<h3>研究目的</h3>
+<ul>
+<li>植被极端生长归因分析</li>
+<li>探究植被极端生长与全球气候极端事件的联系</li>
+</ul>
+<h3>分析方法</h3>
+<ul>
+<li><strong>事件巧合分析</strong>：识别植被极端生长与气候极端事件在时空上的对应关系</li>
+<li><strong>敏感性分析</strong>：量化不同类型植被对各类气候极端事件的响应程度</li>
+</ul>
+<h3>核心指标</h3>
+<p>三个植被指标：SIF、NDVI、LAI</p>
+<h2>2. 数据与数据处理</h2>
+<h3>2.1 数据概述</h3>
+<table>
+<thead>
+<tr>
+<th>数据名称</th>
+<th>数据来源</th>
+<th>时间分辨率</th>
+<th>空间分辨率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SIF</td>
+<td>GOSIF</td>
+<td>8天，2000-2024</td>
+<td>0.05°</td>
+</tr>
+<tr>
+<td>NDVI</td>
+<td>MODIS/Terra Vegetation Indices</td>
+<td>16天，2000.2.18-今</td>
+<td>0.05°</td>
+</tr>
+<tr>
+<td>LAI</td>
+<td>MODIS/Terra Leaf Area Index</td>
+<td>8天，2000.2.18-今</td>
+<td>500m</td>
+</tr>
+<tr>
+<td>气象数据</td>
+<td>TerraClimate</td>
+<td>月，2000-2024</td>
+<td>1/24°</td>
+</tr>
+<tr>
+<td>植被生长周期</td>
+<td>根据NDVI划定</td>
+<td>/</td>
+<td>/</td>
+</tr>
+<tr>
+<td>土地覆盖/利用数据</td>
+<td>MODIS/Terra+Aqua Land Cover Type</td>
+<td>年，2001-今</td>
+<td>0.05°</td>
+</tr>
+</tbody>
+</table>
+<h3>数据链接</h3>
+<ul>
+<li><strong>SIF</strong>: https://globalecology.unh.edu/data/GOSIF.html</li>
+<li><strong>NDVI</strong>: https://www.earthdata.nasa.gov/data/catalog/lpcloud-mod13c2-061</li>
+<li><strong>LAI</strong>: https://www.earthdata.nasa.gov/data/catalog/lpcloud-mod15a2h-061</li>
+<li><strong>气象数据</strong>: https://www.climatologylab.org/terraclimate.html</li>
+<li>Maximum temperature (MaxT)</li>
+<li>Minimum temperature (MinT)</li>
+<li>Precipitation (P)</li>
+<li>Potential evapotranspiration (PET)</li>
+<li><strong>植被生长周期</strong>: https://www.earthdata.nasa.gov/data/catalog/lpcloud-mcd12q2-061</li>
+<li><strong>土地覆盖</strong>: https://www.earthdata.nasa.gov/data/catalog/lpcloud-mcd12c1-061</li>
+</ul>
+<h1>2.2 数据预处理</h1>
+<p><strong>时间尺度统一设定为：2000–2024 年</strong><br />
+<strong>空间分辨率统一为：0.05°（最终所有数据统一至 0.25°）</strong></p>
+<hr />
+<h1>2.2.1 NDVI 数据处理</h1>
+<h2>（1）数据提取与聚合</h2>
+<h3>数据来源</h3>
+<p>MODIS CMG 0.05° 16-day NDVI 产品</p>
+<h3>提取变量</h3>
+<ul>
+<li><code>MODIS_Grid_16Day_VI_CMG:"CMG 0.05 Deg 16 days NDVI"</code></li>
+<li><code>MODIS_Grid_16Day_VI_CMG:"CMG 0.05 Deg 16 days NDVI std dev"</code></li>
+</ul>
+<h3>时间范围</h3>
+<p>2000年至今</p>
+<h3>输出格式</h3>
+<p>合并为一个长期序列的 <code>.nc</code> 文件</p>
+<h3>实现方式</h3>
+<p>使用自编译程序：</p>
+<pre><code class="language-python">extract_data2nc.py
+</code></pre>
+<hr />
+<h2>（2）数据平滑处理</h2>
+<h3>方法</h3>
+<p>HANTS（Harmonic Analysis of NDVI Time-Series）</p>
+<h3>生长季提取方法</h3>
+<p>基于 EDVI 上升速率与下降速率识别生长季。</p>
+<hr />
+<h1>2.2.2 气象数据处理</h1>
+<h2>（1）趋势处理策略</h2>
+<p>同时进行两种处理：</p>
+<ol>
+<li>保留原始数据</li>
+<li>去趋势数据（最小二乘法）</li>
+</ol>
+<h3>去趋势方法</h3>
+<p>最小二乘法（Linear Least Squares）</p>
+<h3>科学判断逻辑</h3>
+<ul>
+<li>若去趋势与未去趋势结果一致 → 结论稳健可靠</li>
+<li>若存在差异 → 需要深入分析长期趋势与短期波动的相对贡献<br />
+  → 该差异本身可能具有重要科学意义</li>
+</ul>
+<hr />
+<h2>（2）极端事件定义</h2>
+<h3>判定标准</h3>
+<p>大于或小于年际变化的 <strong>1 个标准差（1σ）</strong></p>
+<p>说明：
+- 1.5σ、2.0σ 事件过少，不采用</p>
+<h3>时间尺度</h3>
+<p>按年统计</p>
+<h3>判定范围</h3>
+<p>仅在生长季（SOS–EOS）期间判断</p>
+<p>示例：
+- 若 2001 年生长季为 DOY 100–240<br />
+- 仅在 100–240 范围内判断是否为极端气候事件</p>
+<hr />
+<h1>3 气象数据预处理流程</h1>
+<h2>原始数据说明</h2>
+<p>文件命名格式：</p>
+<pre><code class="language-text">TerraClimate_tmax_YYYY.nc
+</code></pre>
+<p>其中：
+- <code>YYYY</code> 为年份
+- <code>tmax</code> 为变量（最大温度）</p>
+<h3>nc 文件变量</h3>
+<ul>
+<li><code>crs</code></li>
+<li><code>lon</code></li>
+<li><code>lat</code></li>
+<li><code>tmax</code></li>
+<li><code>time</code>（格式：YYYY-MM-DD）</li>
+</ul>
+<h3>原始分辨率</h3>
+<ul>
+<li>纬度大小：4320</li>
+<li>经度大小：8640</li>
+<li>分辨率：1/24°</li>
+</ul>
+<hr />
+<h2>处理目标</h2>
+<h3>（1）重采样</h3>
+<ul>
+<li>重采样至 0.25°</li>
+<li>网格与 GPP 文件一致</li>
+<li>方法：Bilinear interpolation</li>
+</ul>
+<hr />
+<h3>（2）掩膜处理</h3>
+<ul>
+<li>若 GPP 文件中该像元为 NaN</li>
+<li>气象变量对应像元赋值为 NaN</li>
+</ul>
+<hr />
+<h3>（3）时间格式转换</h3>
+<ul>
+<li>原格式：YYYY-MM-DD</li>
+<li>转换为：DOY（年内第几天）</li>
+</ul>
+<hr />
+<h3>（4）函数接口</h3>
+<pre><code class="language-python">def process_climate(
+    input_GPP_file_nc,
+    input_climate_file,
+    output_climate_file
+):
+    &quot;&quot;&quot;
+    1. 重采样至0.25°
+    2. 应用GPP掩膜
+    3. 时间转换为DOY
+    4. 输出nc文件
+    &quot;&quot;&quot;
+    pass
+</code></pre>
+<hr />
+<h2>输出文件格式</h2>
+<pre><code class="language-text">TerraClimate_变量_detrend_YYYY_0.25deg.nc
+</code></pre>
+<h3>变量包括</h3>
+<ul>
+<li>lon</li>
+<li>lat</li>
+<li>time（DOY）</li>
+<li>变量名</li>
+</ul>
+<hr />
+<h1>4 生长季文件结构</h1>
+<p>文件名：</p>
+<pre><code class="language-text">Phenology_YYYY.nc
+</code></pre>
+<h3>公共变量</h3>
+<ul>
+<li>lon</li>
+<li>lat</li>
+</ul>
+<h3>生长季变量</h3>
+<ul>
+<li>SOS1</li>
+<li>EOS1</li>
+<li>DOS1</li>
+<li>SOS2</li>
+<li>EOS2</li>
+<li>DOS2</li>
+</ul>
+<hr />
+<h2>规则说明</h2>
+<h3>单峰生长</h3>
+<ul>
+<li>SOS2、EOS2、DOS2 全为 NaN</li>
+</ul>
+<h3>双峰生长</h3>
+<ul>
+<li>两组均有值</li>
+</ul>
+<h3>时间格式</h3>
+<ul>
+<li>DOY 格式</li>
+<li>允许：</li>
+<li>负值（表示距本年前 n 天）</li>
+<li>
+<blockquote>
+<p>365（表示距本年后 n−365 天）</p>
+</blockquote>
+</li>
+</ul>
+<hr />
+<h1>5 极端气象事件识别</h1>
+<h2>输入函数</h2>
+<pre><code class="language-python">def detect_extreme_events(
+    phenology_file,
+    detrended_climate_file,
+    output_file,
+    threshold_type,   # &quot;greater&quot; 或 &quot;less&quot;
+    variable_name
+):
+    &quot;&quot;&quot;
+    1. 读取SOS-EOS
+    2. 提取生长季气候变量
+    3. 计算年际标准差
+    4. 判断 &gt;1σ 或 &lt; -1σ
+    5. 统计极端事件次数
+    &quot;&quot;&quot;
+    pass
+</code></pre>
+<hr />
+<h2>输出文件变量</h2>
+<ul>
+<li>lat</li>
+<li>lon</li>
+<li>event_counts</li>
+</ul>
+<p>表示每个像元在生长季期间的极端事件个数。</p>
+<hr />
+<h1>6 性能优化方案</h1>
+<ul>
+<li>使用 <code>@njit</code> 加速</li>
+<li>并行计算</li>
+<li>共享内存</li>
+<li>纬度分块计算</li>
+<li>显示进度条</li>
+<li>优化内存占用</li>
+</ul>
+<hr />
+<h1>7 GPP 数据预处理</h1>
+<h2>（1）无效值剔除</h2>
+<p>对于每个像元：</p>
+<ul>
+<li>若整个时间序列最大值 &lt; 2.0<br />
+→ 判定为裸地或无植被区域<br />
+→ 剔除</li>
+</ul>
+<hr />
+<h2>（2）重采样</h2>
+<ul>
+<li>方法：Bilinear</li>
+<li>分辨率统一至 0.25°</li>
+</ul>
+<hr />
+<h2>（3）插值</h2>
+<ul>
+<li>方法：PCHIP</li>
+<li>构建 2000–2024 年逐日连续数据</li>
+</ul>
+<hr />
+<h2>（4）Savitzky-Golay 平滑</h2>
+<p>逐年进行平滑处理。</p>
+<hr />
+<h2>（5）Grubbs 迭代异常值剔除</h2>
+<h3>处理步骤</h3>
+<ol>
+<li>计算平滑 GPP</li>
+<li>计算比值：平滑GPP / 原始GPP</li>
+<li>若比值 &gt; 平均比值的标准差 → 判为异常</li>
+<li>用平滑值替换异常值</li>
+<li>继续迭代</li>
+</ol>
+<h3>终止条件</h3>
+<ul>
+<li>达到 20 次迭代</li>
+<li>或无异常值</li>
+</ul>
+<hr />
+<h2>（6）年末过平滑修正</h2>
+<p>由于 Savitzky-Golay 会导致年末过平滑：</p>
+<ul>
+<li>对 DOY 330 – 次年 30</li>
+<li>使用小窗口再平滑</li>
+<li>替换原过平滑数据</li>
+</ul>
+<hr />
+<h1>8 生长季识别方法（全球尺度）</h1>
+<h2>窗口构建</h2>
+<p>窗口年 = 本年 ± 半年<br />
+解决南半球跨年生长问题。</p>
+<hr />
+<h2>（1）基点与峰值识别</h2>
+<p>方法：PELT</p>
+<ul>
+<li>基点 → 峰值 → 下一个基点</li>
+<li>上升段为生长期</li>
+</ul>
+<hr />
+<h2>（2）伪峰剔除</h2>
+<ul>
+<li>基于振幅阈值筛选</li>
+</ul>
+<hr />
+<h2>（3）SOS / EOS 判定</h2>
+<p>采用 10% 振幅阈值法：</p>
+<ul>
+<li>SOS：上升至振幅10%位置</li>
+<li>EOS：下降至振幅10%位置</li>
+</ul>
+<hr />
+<h1>9 生长类型划分</h1>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>单峰</td>
+<td>一个生长期</td>
+</tr>
+<tr>
+<td>双峰</td>
+<td>两个显著生长期</td>
+</tr>
+<tr>
+<td>常年生长</td>
+<td>直接设定 SOS=1，EOS=365</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1>10 植被类型重分类</h1>
+<table>
+<thead>
+<tr>
+<th>新类别</th>
+<th>包含原始类别</th>
+<th>生态含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Evergreen forests</td>
+<td>1 + 2</td>
+<td>常绿林（高稳定GPP，对水分更敏感）</td>
+</tr>
+<tr>
+<td>Deciduous forests</td>
+<td>3 + 4</td>
+<td>落叶林（强季节性，对温度极端更敏感）</td>
+</tr>
+<tr>
+<td>Mixed forests</td>
+<td>5</td>
+<td>混交林（过渡响应）</td>
+</tr>
+<tr>
+<td>Shrublands</td>
+<td>6 + 7</td>
+<td>灌丛（半干旱水分限制明显）</td>
+</tr>
+<tr>
+<td>Savannas &amp; woody grass systems</td>
+<td>8 + 9</td>
+<td>稀树草原（强水热耦合系统）</td>
+</tr>
+<tr>
+<td>Grasslands</td>
+<td>10</td>
+<td>草地（对干旱与热浪极端高度敏感）</td>
+</tr>
+<tr>
+<td>Wetlands</td>
+<td>11</td>
+<td>湿地（能量限制 + 水文控制）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</article>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 | Personal Academic Archive</p>
+        </div>
+    </footer>
+</body>
+</html>
