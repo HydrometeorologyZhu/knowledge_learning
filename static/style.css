@@ -1,0 +1,70 @@
+body {
+    font-family: "Times New Roman", serif;
+    background: #f8f9fb;
+    color: #222;
+    margin: 0;
+    line-height: 1.8;
+}
+
+.container {
+    width: 900px;
+    margin: 0 auto;
+}
+
+header {
+    border-bottom: 1px solid #ddd;
+    padding: 20px 0;
+    background: white;
+}
+
+header h1 {
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: 1px;
+}
+
+nav a {
+    margin-right: 20px;
+    text-decoration: none;
+    color: #333;
+}
+
+nav a:hover {
+    border-bottom: 1px solid #333;
+}
+
+.hero {
+    text-align: center;
+    margin-top: 80px;
+}
+
+.post-list {
+    list-style: none;
+    padding: 0;
+}
+
+.post-list li {
+    margin: 10px 0;
+}
+
+.post-list a {
+    text-decoration: none;
+    color: #000;
+}
+
+.post-list a:hover {
+    text-decoration: underline;
+}
+
+.post {
+    margin-top: 40px;
+}
+
+footer {
+    border-top: 1px solid #ddd;
+    margin-top: 80px;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 14px;
+    background: white;
+}

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title if title else "Academic Notes" }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><a href="/">Academic Research Notes</a></h1>
+            <nav>
+                {% for cat in ["hydrology","meteorology","codes","culture","movies"] %}
+                    <a href="/{{cat}}/">{{ cat.capitalize() }}</a>
+                {% endfor %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 | Personal Academic Archive</p>
+        </div>
+    </footer>
+</body>
+</html>

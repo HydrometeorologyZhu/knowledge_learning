@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ category.capitalize() }}</h2>
+
+<ul class="post-list">
+    {% for post in posts %}
+        <li>
+            <a href="/{{category}}/{{post.replace('.md','.html')}}">{{ post.replace(".md","") }}</a>
+        </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}
